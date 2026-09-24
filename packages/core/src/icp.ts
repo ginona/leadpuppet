@@ -5,7 +5,7 @@ import type { IcpProfile, IcpQuery } from './types.js';
 import { getVariantsForCategories } from './variants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// packages/core/src -> packages/core -> packages -> raíz del monorepo -> icp/
+// packages/core/src -> packages/core -> packages -> monorepo root -> icp/
 const ICP_DIR = path.join(__dirname, '..', '..', '..', 'icp');
 
 const ICP_NAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
@@ -15,8 +15,8 @@ export function isValidIcpName(name: string): boolean {
 }
 
 /**
- * Valida un objeto crudo (de un archivo de perfil o de un body HTTP inline)
- * contra el schema de IcpProfile. `label` es solo para los mensajes de error.
+ * Validates a raw object (from a profile file or an inline HTTP body)
+ * against the IcpProfile schema. `label` is only used in error messages.
  */
 export function parseIcpProfile(raw: unknown, label: string): IcpProfile {
   const parsed = (raw ?? {}) as Partial<IcpProfile>;

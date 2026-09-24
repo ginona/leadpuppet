@@ -6,7 +6,7 @@ function normalizeKey(lead: Lead): string {
       const url = new URL(lead.website.startsWith('http') ? lead.website : `https://${lead.website}`);
       return `domain:${url.hostname.replace(/^www\./, '').toLowerCase()}`;
     } catch {
-      // website no es una URL válida, seguimos al fallback por nombre
+      // website isn't a valid URL, fall through to the name-based fallback
     }
   }
   return `name:${lead.name.trim().toLowerCase()}`;

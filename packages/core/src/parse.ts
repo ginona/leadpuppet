@@ -15,8 +15,8 @@ export function toLead(raw: RawPlace, sourceQuery: string, includeInstagram = fa
     sourceQuery,
   };
 
-  // Campo "instagram" solo se agrega cuando el flag está activo — así el
-  // shape del objeto (y del JSON de salida) queda idéntico al default.
+  // The "instagram" field is only added when the flag is on — so the
+  // object's shape (and the output JSON's) stays identical to the default.
   if (includeInstagram) {
     lead.instagram = raw.websiteUri ? extractInstagramHandle(raw.websiteUri) : null;
   }

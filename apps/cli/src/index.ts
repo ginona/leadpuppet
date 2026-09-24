@@ -5,7 +5,7 @@ async function main(): Promise<void> {
   const config = loadConfig();
   const args = parseArgs(process.argv.slice(2));
 
-  console.log(`🐶 LeadPuppet — ${config.mockApi ? 'MOCK' : 'REAL'} mode`);
+  console.log(`🐶 LeadPuppet — ${config.mockApi ? 'MOCK' : 'LIVE'} mode`);
   if (args.includeInstagram) {
     console.log('📸 Instagram handle capture: ON');
   }

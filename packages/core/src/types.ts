@@ -39,9 +39,9 @@ export interface Lead {
   rating: number | null;
   reviewCount: number | null;
   sourceQuery: string;
-  /** Solo presente cuando se corre con --include-instagram; ausente (no null) en modo default. */
+  /** Only present when run with --include-instagram; absent (not null) in default mode. */
   instagram?: string | null;
-  /** Solo presente cuando --include-instagram detecta que website es un redirect puro de WhatsApp. */
+  /** Only present when --include-instagram detects that website is a pure WhatsApp redirect. */
   whatsapp?: string | null;
 }
 

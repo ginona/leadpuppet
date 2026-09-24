@@ -5,8 +5,8 @@ import { loadEnrichConfig, runEnrichment, type Lead } from '@leadpuppet/core';
 import { parseEnrichArgs } from './enrich-cli.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// apps/cli/src -> apps/cli -> apps -> raíz del monorepo. Fijo en vez de process.cwd():
-// `pnpm --filter` cambia el cwd a apps/cli, y --input se escribe relativo a la raíz.
+// apps/cli/src -> apps/cli -> apps -> monorepo root. Fixed instead of process.cwd():
+// `pnpm --filter` changes the cwd to apps/cli, and --input is written relative to the root.
 const REPO_ROOT = path.join(__dirname, '..', '..', '..');
 
 async function main(): Promise<void> {
@@ -19,7 +19,7 @@ async function main(): Promise<void> {
   const resolvedInputPath = path.resolve(REPO_ROOT, inputPath);
 
   console.log('🐶 LeadPuppet enrich');
-  console.log(`📂 Leyendo ${resolvedInputPath}`);
+  console.log(`📂 Reading ${resolvedInputPath}`);
   if (includeInstagram) {
     console.log('📸 Instagram handle capture: ON');
   }

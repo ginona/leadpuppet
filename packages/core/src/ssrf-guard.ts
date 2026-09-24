@@ -2,14 +2,14 @@ import dns from 'node:dns/promises';
 import net from 'node:net';
 
 /**
- * Protección SSRF para cualquier URL provista directamente por un usuario
- * (hoy: el endpoint /analyze). Valida esquema, hostname y — vía resolución
- * DNS — que ninguna IP resuelta caiga en un rango privado/reservado, para
- * evitar que el servidor haga fetch a localhost, la red interna de Railway,
- * o el endpoint de metadata de un cloud provider (169.254.169.254).
+ * SSRF protection for any URL provided directly by a user (currently: the
+ * /analyze endpoint). Validates scheme, hostname and — via DNS resolution —
+ * that no resolved IP falls in a private/reserved range, to prevent the
+ * server from fetching localhost, an internal network, or a cloud
+ * provider's metadata endpoint (169.254.169.254).
  *
- * No se usa en el pipeline de discover/enrich: ahí las URLs vienen de los
- * resultados de Google Places, no directamente de un input de usuario.
+ * Not used in the discover/enrich pipeline: there, URLs come from Google
+ * Places results, not directly from user input.
  */
 
 const BLOCKED_HOSTNAMES = new Set(['localhost']);
@@ -44,15 +44,15 @@ function isPrivateIPv6(ip: string): boolean {
 function isPrivateOrReservedIp(ip: string): boolean {
   if (net.isIPv4(ip)) return isPrivateIPv4(ip);
   if (net.isIPv6(ip)) return isPrivateIPv6(ip);
-  return true; // formato desconocido → tratarlo como inseguro
+  return true; // unknown format → treat as unsafe
 }
 
 /**
- * Valida que `rawUrl` sea http(s), no apunte a un hostname bloqueado, y que
- * ninguna IP a la que resuelva (chequeamos TODAS, no solo la primera, para
- * cubrir DNS rebinding) sea privada/reservada. Devuelve el URL parseado
- * (con protocolo por defecto https:// si no vino ninguno) listo para hacer
- * fetch; lanza un Error genérico si algo no es seguro.
+ * Validates that `rawUrl` is http(s), doesn't point to a blocked hostname, and
+ * that no IP it resolves to (we check ALL of them, not just the first, to
+ * cover DNS rebinding) is private/reserved. Returns the parsed URL (with
+ * https:// as the default protocol if none was given) ready to fetch;
+ * throws a generic Error if anything is unsafe.
  */
 export async function assertPublicHttpUrl(rawUrl: string): Promise<URL> {
   const trimmed = rawUrl.trim();

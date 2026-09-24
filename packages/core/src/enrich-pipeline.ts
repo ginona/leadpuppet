@@ -39,9 +39,9 @@ function flagDomainMismatch(
 type ContactSource = 'regex' | 'llm';
 
 /**
- * Capa 1: regex sobre el HTML completo (gratis). Si hay un email del mismo
- * dominio, se usa (confidence "medium": dato correcto pero sin nombre/rol) y
- * NO se llama al LLM. Capa 2: solo si la Capa 1 no encontró nada usable.
+ * Layer 1: regex over the full HTML (free). If there's an email on the same
+ * domain, it's used (confidence "medium": correct data but no name/role) and
+ * the LLM is NOT called. Layer 2: only if Layer 1 found nothing usable.
  */
 async function enrichWebsite(
   website: string,
@@ -124,9 +124,9 @@ export async function runEnrichment(
 
         try {
           if (isWhatsApp) {
-            // Redirect puro de WhatsApp (wa.link/wa.me/api.whatsapp.com): no hay
-            // HTML real para scrapear — el link en sí ES el dato de contacto.
-            // No se toca la caché (no hay nada que fetchear ni memoizar).
+            // Pure WhatsApp redirect (wa.link/wa.me/api.whatsapp.com): there's no
+            // real HTML to scrape — the link itself IS the contact data.
+            // The cache is left untouched (nothing to fetch or memoize).
             contact = EMPTY_CONTACT;
             whatsappLink = lead.website.trim();
           } else {
@@ -138,10 +138,10 @@ export async function runEnrichment(
               instagramFromEnrich = cached.instagram ?? null;
               sources.fromCache += 1;
 
-              // La entrada cacheada viene de antes de --include-instagram (o de una
-              // corrida sin el flag): el email ya es confiable desde cache, pero
-              // instagram nunca se buscó. Hacemos un fetch liviano SOLO para
-              // escanear el HTML por el link de IG, sin retocar el contacto.
+              // The cached entry predates --include-instagram (or comes from a run
+              // without the flag): the email is already trusted from cache, but
+              // instagram was never searched. We do a lightweight fetch ONLY to
+              // scan the HTML for the IG link, without touching the contact.
               if (includeInstagram && !('instagram' in cached)) {
                 try {
                   const page = await fetchContactPage(lead.website);
@@ -150,14 +150,14 @@ export async function runEnrichment(
                   cache[domain] = { ...cached, instagram: found };
                   cacheDirty = true;
                 } catch {
-                  // Best-effort: un fallo acá no invalida el contacto ya confirmado.
+                  // Best-effort: a failure here doesn't invalidate the already-confirmed contact.
                 }
               }
             } else {
               const result = await enrichWebsite(lead.website, domain, config.openaiApiKey, includeInstagram, log);
               if (result) {
-                // Solo se agrega la clave "instagram" a la caché cuando el flag está
-                // activo, para que las corridas default no cambien el shape del cache.
+                // The "instagram" key is only added to the cache when the flag is
+                // on, so default runs don't change the cache shape.
                 const cachedEntry: CachedContact = includeInstagram
                   ? { ...result.contact, instagram: result.instagram }
                   : result.contact;
@@ -204,10 +204,10 @@ export async function runEnrichment(
           confidence: contact.confidence,
         };
 
-        // Igual que en Lead: las claves "instagram"/"whatsapp" solo existen
-        // cuando el flag está activo. instagram prioriza lo encontrado en
-        // enrich; si no encontró nada, conserva lo que ya venía de discovery
-        // (website que apuntaba a IG).
+        // Same as in Lead: the "instagram"/"whatsapp" keys only exist when
+        // the flag is on. instagram prefers what enrich found; if it found
+        // nothing, it keeps what already came from discovery (a website
+        // that pointed to IG).
         if (includeInstagram) {
           enrichedLead.instagram = instagramFromEnrich ?? lead.instagram ?? null;
           enrichedLead.whatsapp = whatsappLink;
@@ -222,10 +222,10 @@ export async function runEnrichment(
     await writeEnrichedCache(cache);
   }
 
-  // Se guarda un lead si tiene email, O (con el flag activo) instagram/whatsapp
-  // — si no, ese dato "capturado" nunca llegaría al archivo final. Con el flag
-  // apagado, instagram/whatsapp nunca están seteados y esto se reduce exactamente
-  // al filtro de siempre (contactEmail !== null): comportamiento default intacto.
+  // A lead is kept if it has an email, OR (with the flag on) instagram/whatsapp
+  // — otherwise that "captured" data would never reach the final file. With the
+  // flag off, instagram/whatsapp are never set and this reduces exactly to the
+  // usual filter (contactEmail !== null): default behavior intact.
   const withEmailCount = enrichedLeads.filter((lead) => lead.contactEmail !== null).length;
   const kept = enrichedLeads.filter(
     (lead) => lead.contactEmail !== null || Boolean(lead.instagram) || Boolean(lead.whatsapp)

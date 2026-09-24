@@ -20,7 +20,7 @@ const FIELD_MASK = [
 
 const MAX_RETRIES = 4;
 const MAX_PAGES = 3;
-// Google tarda un momento en activar el nextPageToken; pedirlo antes devuelve INVALID_ARGUMENT.
+// Google takes a moment to activate the nextPageToken; requesting it earlier returns INVALID_ARGUMENT.
 const NEXT_PAGE_DELAY_MS = 2000;
 
 function sleep(ms: number): Promise<void> {

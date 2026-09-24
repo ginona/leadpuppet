@@ -1,4 +1,4 @@
-// Segmentos de path de instagram.com que NO son un handle de perfil (posts, reels, secciones fijas del sitio, etc.)
+// instagram.com path segments that are NOT a profile handle (posts, reels, fixed site sections, etc.)
 const RESERVED_PATHS = new Set([
   'p',
   'reel',
@@ -21,10 +21,10 @@ const RESERVED_PATHS = new Set([
 const HANDLE_PATTERN = /^[a-zA-Z0-9._]{1,30}$/;
 
 /**
- * Dado un URL, si apunta al perfil de un negocio en instagram.com devuelve
- * el handle limpio (sin @, sin query params, sin trailing slash). null si
- * no es instagram.com, o si el primer segmento del path es una sección fija
- * del sitio (post, reel, explore, etc.) en vez de un usuario.
+ * Given a URL, if it points to a business profile on instagram.com returns
+ * the clean handle (no @, no query params, no trailing slash). null if it's
+ * not instagram.com, or if the first path segment is a fixed site section
+ * (post, reel, explore, etc.) rather than a user.
  */
 export function extractInstagramHandle(url: string): string | null {
   const trimmed = url.trim();
@@ -52,9 +52,9 @@ export function extractInstagramHandle(url: string): string | null {
 const HREF_PATTERN = /href\s*=\s*["']([^"']*instagram\.com[^"']*)["']/gi;
 
 /**
- * Busca links a instagram.com en el HTML crudo (mismo enfoque que
- * findSiteEmail en email-regex.ts: sin limpiar/truncar) y devuelve el
- * handle más repetido. null si no hay ningún link de perfil válido.
+ * Looks for instagram.com links in the raw HTML (same approach as
+ * findSiteEmail in email-regex.ts: no cleaning/truncating) and returns the
+ * most repeated handle. null if there's no valid profile link.
  */
 export function findInstagramHandle(html: string): string | null {
   const hits = new Map<string, number>();

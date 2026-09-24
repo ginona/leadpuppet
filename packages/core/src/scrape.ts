@@ -28,7 +28,7 @@ async function fetchPage(url: string): Promise<FetchedPage | null> {
 
     return { url, html };
   } catch {
-    // sitio caído, timeout, redirect infinito, DNS inválido, etc. — se prueba la siguiente URL candidata
+    // site down, timeout, infinite redirect, invalid DNS, etc. — try the next candidate URL
     return null;
   } finally {
     clearTimeout(timer);
@@ -36,9 +36,9 @@ async function fetchPage(url: string): Promise<FetchedPage | null> {
 }
 
 /**
- * Prueba /contact, /contact-us, /about y por último la home, en ese orden,
- * y devuelve la primera que responda 200 con contenido. null si ninguna
- * respondió (sitio inaccesible).
+ * Tries /contact, /contact-us, /about and finally the home page, in that order,
+ * and returns the first one that responds 200 with content. null if none
+ * responded (unreachable site).
  */
 export async function fetchContactPage(website: string): Promise<FetchedPage | null> {
   const origin = toOrigin(website);

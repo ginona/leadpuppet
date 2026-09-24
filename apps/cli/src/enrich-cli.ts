@@ -16,7 +16,7 @@ export function parseEnrichArgs(argv: string[]): EnrichCliArgs {
 
   const inputPath = args.get('input')?.trim();
   if (!inputPath) {
-    throw new Error('❌ Falta el argumento --input. Ejemplo: --input=leadoutput/leads-2026-01-01T00-00-00-000Z.json');
+    throw new Error('❌ Missing --input argument. Example: --input=leadoutput/leads-2026-01-01T00-00-00-000Z.json');
   }
 
   const concurrencyRaw = args.get('concurrency');

@@ -1,7 +1,7 @@
-// Dominios de acortadores/agregadores genéricos: el dominio base lo comparten
-// muchos negocios distintos (ej. wa.link/s1lf75 y wa.link/x9k2p1 son negocios
-// distintos) — el path es lo que identifica a CADA uno, así que para estos
-// casos la clave de caché tiene que incluir el path, no solo el host.
+// Generic shortener/aggregator domains: the base domain is shared by many
+// different businesses (e.g. wa.link/s1lf75 and wa.link/x9k2p1 are different
+// businesses) — the path is what identifies EACH one, so for these cases the
+// cache key has to include the path, not just the host.
 const SHORTENER_DOMAINS = new Set([
   'wa.link',
   'wa.me',
@@ -32,8 +32,8 @@ export function normalizeDomain(website: string): string {
     const host = url.hostname.replace(/^www\./i, '').toLowerCase();
 
     if (SHORTENER_DOMAINS.has(host)) {
-      // Los short-codes suelen ser case-sensitive (base62) — el path NO se
-      // lowercasea, para no fusionar dos negocios distintos en una clave.
+      // Short codes are often case-sensitive (base62) — the path is NOT
+      // lowercased, so two different businesses don't merge into one key.
       const path = url.pathname.replace(/\/+$/, '');
       return path ? `${host}${path}` : host;
     }
@@ -51,8 +51,8 @@ export function normalizeDomain(website: string): string {
 const WHATSAPP_REDIRECT_DOMAINS = new Set(['wa.link', 'wa.me', 'api.whatsapp.com']);
 
 /**
- * true si el website es un redirect puro de WhatsApp (wa.link/wa.me/api.whatsapp.com):
- * no tienen HTML real para scrapear, el link en sí ES el dato de contacto.
+ * true if the website is a pure WhatsApp redirect (wa.link/wa.me/api.whatsapp.com):
+ * they have no real HTML to scrape, the link itself IS the contact data.
  */
 export function isWhatsAppRedirect(website: string): boolean {
   const trimmed = website.trim();
@@ -76,7 +76,7 @@ export function emailDomain(email: string): string | null {
     .toLowerCase();
 }
 
-/** true si son el mismo dominio o uno es subdominio del otro (ej. mail.foo.com y foo.com). */
+/** true if they're the same domain or one is a subdomain of the other (e.g. mail.foo.com and foo.com). */
 export function domainsMatch(a: string, b: string): boolean {
   return a === b || a.endsWith(`.${b}`) || b.endsWith(`.${a}`);
 }

@@ -29,11 +29,11 @@ async function fetchHtml(rawUrl: string): Promise<string> {
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    // Sitios reales suelen redirigir (http→https, sin-www→www, etc.), así que
-    // no podemos simplemente prohibir redirects. En cambio los seguimos a
-    // mano y re-validamos CADA salto contra assertPublicHttpUrl — si no,
-    // un atacante podría pasar una URL pública que redirige a
-    // 169.254.169.254 y saltarse el chequeo SSRF por completo.
+    // Real sites often redirect (http→https, non-www→www, etc.), so we can't
+    // simply forbid redirects. Instead we follow them manually and
+    // re-validate EVERY hop against assertPublicHttpUrl — otherwise an
+    // attacker could pass a public URL that redirects to
+    // 169.254.169.254 and bypass the SSRF check entirely.
     let url = await assertPublicHttpUrl(rawUrl);
     let response: Response;
     let redirects = 0;

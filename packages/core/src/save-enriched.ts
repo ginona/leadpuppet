@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { EnrichedLead } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// packages/core/src -> packages/core -> packages -> raíz del monorepo -> leadoutput/
+// packages/core/src -> packages/core -> packages -> monorepo root -> leadoutput/
 const DEFAULT_OUT_DIR = path.join(__dirname, '..', '..', '..', 'leadoutput');
 
 export async function saveEnrichedResults(leads: EnrichedLead[], outDir = DEFAULT_OUT_DIR): Promise<string> {

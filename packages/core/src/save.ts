@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 import type { Lead } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// packages/core/src -> packages/core -> packages -> raíz del monorepo -> leadoutput/
-// Fijo en vez de relativo a process.cwd(): así cae siempre en el mismo lugar
-// sin importar si lo invoca el CLI (root o pnpm --filter) o la API.
+// packages/core/src -> packages/core -> packages -> monorepo root -> leadoutput/
+// Fixed instead of relative to process.cwd(): so it always lands in the same
+// place regardless of whether it's invoked from the CLI (root or pnpm --filter).
 const DEFAULT_OUT_DIR = path.join(__dirname, '..', '..', '..', 'leadoutput');
 
 export async function saveResults(leads: Lead[], outDir = DEFAULT_OUT_DIR): Promise<string> {

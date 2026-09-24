@@ -4,12 +4,12 @@ import { fileURLToPath } from 'node:url';
 import type { ContactInfo } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// packages/core/src -> packages/core -> packages -> raíz del monorepo -> cache/
+// packages/core/src -> packages/core -> packages -> monorepo root -> cache/
 const CACHE_DIR = path.join(__dirname, '..', '..', '..', 'cache');
 const CACHE_PATH = path.join(CACHE_DIR, 'enriched-domains.json');
 
-// Extiende ContactInfo (no lo modifica) para no tocar el contrato del LLM/API;
-// "instagram" solo aparece en entradas cacheadas por corridas con --include-instagram.
+// Extends ContactInfo (doesn't modify it) so the LLM/API contract stays untouched;
+// "instagram" only appears in cache entries created by runs with --include-instagram.
 export interface CachedContact extends ContactInfo {
   instagram?: string | null;
 }
