@@ -29,8 +29,8 @@ domain in `cache/`.
 Requires Node.js ≥ 20 and [pnpm](https://pnpm.io/).
 
 ```bash
-git clone https://github.com/ginona/leadpuppet-oss.git
-cd leadpuppet-oss
+git clone https://github.com/ginona/leadpuppet.git
+cd leadpuppet
 pnpm install
 cp .env.example .env
 ```

@@ -7,11 +7,11 @@
   "author": "Gino Nacchio",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ginona/leadpuppet-oss.git"
+    "url": "git+https://github.com/ginona/leadpuppet.git"
   },
-  "homepage": "https://github.com/ginona/leadpuppet-oss#readme",
+  "homepage": "https://github.com/ginona/leadpuppet#readme",
   "bugs": {
-    "url": "https://github.com/ginona/leadpuppet-oss/issues"
+    "url": "https://github.com/ginona/leadpuppet/issues"
   },
   "keywords": ["lead-generation", "b2b", "google-places", "web-scraping", "contact-enrichment", "openai", "cli", "prospecting", "typescript"],
   "packageManager": "pnpm@10.33.2",
