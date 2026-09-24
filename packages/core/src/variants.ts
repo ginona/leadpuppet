@@ -1,0 +1,127 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// packages/core/src -> packages/core -> packages -> raíz del monorepo -> cache/
+const CACHE_DIR = path.join(__dirname, '..', '..', '..', 'cache');
+const CACHE_PATH = path.join(CACHE_DIR, 'variants.json');
+
+const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+const MODEL = 'gpt-4o-mini';
+
+type VariantsCache = Record<string, string[]>;
+
+function normalizeCategory(category: string): string {
+  return category.trim().toLowerCase();
+}
+
+async function readCache(): Promise<VariantsCache> {
+  try {
+    const raw = await readFile(CACHE_PATH, 'utf-8');
+    return JSON.parse(raw) as VariantsCache;
+  } catch {
+    return {};
+  }
+}
+
+async function writeCache(cache: VariantsCache): Promise<void> {
+  await mkdir(CACHE_DIR, { recursive: true });
+  await writeFile(CACHE_PATH, JSON.stringify(cache, null, 2), 'utf-8');
+}
+
+async function fetchVariantsFromOpenAI(category: string, apiKey: string): Promise<string[]> {
+  const response = await fetch(OPENAI_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      response_format: { type: 'json_object' },
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You generate search phrase variants in English to find local businesses on Google Places. Reply with JSON only.',
+        },
+        {
+          role: 'user',
+          content: `Give me 2 to 3 search phrase variants in English for the business category "${category}" (synonyms like "contractor", "repair company", "services"). Reply as {"variants": ["...", "..."]}.`,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenAI responded ${response.status}`);
+  }
+
+  const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error('OpenAI response has no content');
+  }
+
+  const parsed = JSON.parse(content) as { variants?: unknown };
+  if (!Array.isArray(parsed.variants)) {
+    throw new Error('unexpected variants format');
+  }
+
+  return parsed.variants.filter((v): v is string => typeof v === 'string' && v.trim().length > 0).slice(0, 3);
+}
+
+/**
+ * Devuelve, para cada categoría, la lista de frases de búsqueda a usar:
+ * la categoría original + hasta 3 variantes generadas por OpenAI (cacheadas
+ * en disco). Sin OPENAI_API_KEY, o si la llamada falla, degrada a devolver
+ * solo la categoría original — nunca rompe el flujo de discovery.
+ */
+export async function getVariantsForCategories(
+  categories: string[],
+  apiKey: string | undefined
+): Promise<Record<string, string[]>> {
+  const result: Record<string, string[]> = {};
+
+  if (!apiKey) {
+    for (const category of categories) {
+      result[category] = [category];
+    }
+    return result;
+  }
+
+  const cache = await readCache();
+  let cacheDirty = false;
+
+  for (const category of categories) {
+    const key = normalizeCategory(category);
+
+    if (cache[key]) {
+      result[category] = [category, ...cache[key]];
+      continue;
+    }
+
+    try {
+      const variants = await fetchVariantsFromOpenAI(category, apiKey);
+      if (variants.length === 0) {
+        result[category] = [category];
+        continue;
+      }
+      cache[key] = variants;
+      cacheDirty = true;
+      result[category] = [category, ...variants];
+    } catch (error) {
+      console.log(
+        `⚠️  Could not generate variants for "${category}" (${error instanceof Error ? error.message : error}). Using only the original category.`
+      );
+      result[category] = [category];
+    }
+  }
+
+  if (cacheDirty) {
+    await writeCache(cache);
+  }
+
+  return result;
+}

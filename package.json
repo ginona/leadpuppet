@@ -1,0 +1,24 @@
+{
+  "name": "leadpuppet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source B2B lead discovery and contact enrichment: Google Places + website scraping + GPT-4o-mini.",
+  "license": "MIT",
+  "author": "Gino Nacchio",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ginona/leadpuppet-oss.git"
+  },
+  "homepage": "https://github.com/ginona/leadpuppet-oss#readme",
+  "bugs": {
+    "url": "https://github.com/ginona/leadpuppet-oss/issues"
+  },
+  "keywords": ["lead-generation", "b2b", "google-places", "web-scraping", "contact-enrichment", "openai", "cli", "prospecting", "typescript"],
+  "packageManager": "pnpm@10.33.2",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "discover": "pnpm --filter @leadpuppet/cli discover",
+    "enrich": "pnpm --filter @leadpuppet/cli enrich",
+    "typecheck": "pnpm -r exec tsc --noEmit"
+  }
+}

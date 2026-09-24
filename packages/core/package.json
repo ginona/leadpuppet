@@ -1,0 +1,40 @@
+{
+  "name": "@leadpuppet/core",
+  "version": "0.1.0",
+  "description": "Core library for LeadPuppet: Google Places discovery, dedupe, website scraping and LLM-based contact extraction.",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "p-limit": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "typescript": "^5.6.3"
+  },
+  "license": "MIT",
+  "author": "Gino Nacchio",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ginona/leadpuppet-oss.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/ginona/leadpuppet-oss#readme",
+  "bugs": {
+    "url": "https://github.com/ginona/leadpuppet-oss/issues"
+  },
+  "keywords": [
+    "lead-generation",
+    "b2b",
+    "google-places",
+    "web-scraping",
+    "contact-enrichment",
+    "openai",
+    "prospecting",
+    "typescript"
+  ]
+}

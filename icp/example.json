@@ -1,0 +1,7 @@
+{
+  "name": "example",
+  "categories": ["roofing", "drywall", "electrical"],
+  "cities": ["phoenix", "dallas", "houston"],
+  "targetCount": 100,
+  "maxQueries": 5
+}

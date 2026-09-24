@@ -1,0 +1,30 @@
+{
+  "places": [
+    {
+      "id": "ChIJd8BlQ2BZwokRAFUEcm_qrcA",
+      "displayName": { "text": "Phoenix Roofing Pros", "languageCode": "en" },
+      "formattedAddress": "1234 E Camelback Rd, Phoenix, AZ 85014, USA",
+      "nationalPhoneNumber": "(602) 555-0142",
+      "websiteUri": "https://www.phoenixroofingpros.com",
+      "rating": 4.8,
+      "userRatingCount": 152
+    },
+    {
+      "id": "ChIJrTLr-GyuEmsRBfy61i59si0",
+      "displayName": { "text": "Desert Sky Roofing & Repair", "languageCode": "en" },
+      "formattedAddress": "88 N 7th Ave, Phoenix, AZ 85007, USA",
+      "nationalPhoneNumber": "(602) 555-0199",
+      "websiteUri": "https://desertskyroofing.com",
+      "rating": 4.5,
+      "userRatingCount": 89
+    },
+    {
+      "id": "ChIJnaZqZ3JZwokR8HQZyz-0iOI",
+      "displayName": { "text": "Budget Roof Fixers", "languageCode": "en" },
+      "formattedAddress": "500 W Van Buren St, Phoenix, AZ 85003, USA",
+      "nationalPhoneNumber": "(602) 555-0110",
+      "rating": 3.9,
+      "userRatingCount": 24
+    }
+  ]
+}

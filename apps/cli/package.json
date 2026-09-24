@@ -1,0 +1,40 @@
+{
+  "name": "@leadpuppet/cli",
+  "version": "0.1.0",
+  "description": "CLI for LeadPuppet: discover B2B leads via Google Places and enrich them with contact info.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "discover": "tsx src/index.ts",
+    "enrich": "tsx src/enrich.ts"
+  },
+  "dependencies": {
+    "@leadpuppet/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  },
+  "license": "MIT",
+  "author": "Gino Nacchio",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ginona/leadpuppet-oss.git",
+    "directory": "apps/cli"
+  },
+  "homepage": "https://github.com/ginona/leadpuppet-oss#readme",
+  "bugs": {
+    "url": "https://github.com/ginona/leadpuppet-oss/issues"
+  },
+  "keywords": [
+    "lead-generation",
+    "b2b",
+    "google-places",
+    "cli",
+    "contact-enrichment",
+    "openai",
+    "prospecting",
+    "typescript"
+  ]
+}
