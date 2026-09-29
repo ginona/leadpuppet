@@ -27,21 +27,26 @@ function sanitizeItem(raw: string): string {
   return trimmed;
 }
 
-function parseList(raw: string | undefined, flagName: string): string[] {
-  if (!raw) {
-    throw new Error(`❌ Missing --${flagName} argument. Example: --${flagName}="roofing,drywall"`);
-  }
-
+/** Splits a comma-separated list and validates each item. `label` is only used in error messages. */
+export function splitList(raw: string, label: string): string[] {
   const items = raw
     .split(',')
     .map((item) => sanitizeItem(item))
     .filter((item) => item.length > 0);
 
   if (items.length === 0) {
-    throw new Error(`❌ --${flagName} has no valid values.`);
+    throw new Error(`❌ ${label} has no valid values.`);
   }
 
   return items;
+}
+
+function parseList(raw: string | undefined, flagName: string): string[] {
+  if (!raw) {
+    throw new Error(`❌ Missing --${flagName} argument. Example: --${flagName}="roofing,drywall"`);
+  }
+
+  return splitList(raw, `--${flagName}`);
 }
 
 export function parseArgs(argv: string[]): CliArgs {

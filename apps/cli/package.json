@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "discover": "tsx src/index.ts",
-    "enrich": "tsx src/enrich.ts"
+    "enrich": "tsx src/enrich.ts",
+    "leadpuppet": "tsx src/leadpuppet.ts"
   },
   "dependencies": {
+    "@clack/prompts": "^1.8.1",
     "@leadpuppet/core": "workspace:*"
   },
   "devDependencies": {

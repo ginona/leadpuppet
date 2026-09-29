@@ -19,6 +19,7 @@
   "scripts": {
     "discover": "pnpm --filter @leadpuppet/cli discover",
     "enrich": "pnpm --filter @leadpuppet/cli enrich",
+    "leadpuppet": "pnpm --filter @leadpuppet/cli leadpuppet",
     "typecheck": "pnpm -r exec tsc --noEmit"
   }
 }

@@ -32,16 +32,27 @@ Requires Node.js ≥ 20 and [pnpm](https://pnpm.io/).
 git clone https://github.com/ginona/leadpuppet.git
 cd leadpuppet
 pnpm install
-cp .env.example .env
+pnpm leadpuppet init                           # asks for both API keys, writes .env
+pnpm leadpuppet find "roofing" "houston"       # discover + enrich in one step
 ```
+
+`find` takes comma-separated categories and cities
+(`pnpm leadpuppet find "roofing,drywall" "houston,dallas"`), searches until it
+has 100 leads or has spent 15 searches, then enriches them and prints how many
+have an email plus the path of the final file. Adjust with `--target=<n>` and
+`--max-queries=<n>`; `--include-instagram=true` works as in `enrich`.
+
+`init` switches to live mode (`MOCK_API=false`). The `discover` and `enrich`
+commands below still work on their own for step-by-step runs or ICP profiles.
 
 ### Get the API keys
 
 - **Google Places** — [Google Cloud Console](https://console.cloud.google.com/)
   → APIs & Services → enable **"Places API (New)"** → Credentials → create a
-  key and restrict it to that API. Put it in `GOOGLE_PLACES_API_KEY`.
+  key and restrict it to that API. `pnpm leadpuppet init` saves it as
+  `GOOGLE_PLACES_API_KEY` (or copy `.env.example` to `.env` and set it by hand).
 - **OpenAI** — [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
-  Put it in `OPENAI_API_KEY`. Optional for discovery, required for `enrich`.
+  Saved as `OPENAI_API_KEY`. Optional for discovery, required for `enrich` and `find`.
 
 ### Try it without spending anything (mock mode, the default)
 

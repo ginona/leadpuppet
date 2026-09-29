@@ -5,7 +5,7 @@ loadRootEnv();
 
 export type EnrichOutputField = keyof EnrichedLead;
 
-const OUTPUT_FIELDS: readonly EnrichOutputField[] = [
+export const ENRICH_OUTPUT_FIELDS: readonly EnrichOutputField[] = [
   'name',
   'website',
   'phone',
@@ -35,10 +35,10 @@ function parseOutputFields(raw: string | undefined): EnrichOutputField[] | null 
     .filter(Boolean);
   if (fields.length === 0) return null;
 
-  const unknown = fields.filter((f) => !OUTPUT_FIELDS.includes(f as EnrichOutputField));
+  const unknown = fields.filter((f) => !ENRICH_OUTPUT_FIELDS.includes(f as EnrichOutputField));
   if (unknown.length > 0) {
     throw new Error(
-      `❌ ENRICH_OUTPUT_FIELDS has unknown field(s): ${unknown.join(', ')}. Valid: ${OUTPUT_FIELDS.join(', ')}.`
+      `❌ ENRICH_OUTPUT_FIELDS has unknown field(s): ${unknown.join(', ')}. Valid: ${ENRICH_OUTPUT_FIELDS.join(', ')}.`
     );
   }
 
