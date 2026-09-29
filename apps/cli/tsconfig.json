@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
+    "types": ["node"],
     "paths": {
       "@leadpuppet/core": ["../../packages/core/src/index.ts"]
     }
