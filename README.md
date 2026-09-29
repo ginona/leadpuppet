@@ -118,6 +118,16 @@ Writes `leadoutput/enriched-<timestamp>.json`:
 }
 ```
 
+To keep only some fields, set `ENRICH_OUTPUT_FIELDS` in `.env` (comma-separated;
+empty = all fields). Entries where every listed field is null are dropped:
+
+```bash
+# enriched-*.json → { "leads": [{ "contactEmail": "info@phoenixroofingpros.com" }, ...] }
+ENRICH_OUTPUT_FIELDS=contactEmail
+# or with the business name and how reliable the email is:
+ENRICH_OUTPUT_FIELDS=name,contactEmail,confidence
+```
+
 `confidence`: `high` = the LLM found an explicit email on the business's
 domain, `medium` = the regex layer found an email on the business's domain, or
 the LLM inferred one from a person's name, `low` = nothing reliable (or only a
