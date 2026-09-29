@@ -3,7 +3,7 @@ import type { EnrichConfig } from './enrich-config.js';
 import type { Lead, EnrichedLead, ContactInfo } from './types.js';
 import { fetchContactPage } from './scrape.js';
 import { extractContact } from './contact-extract.js';
-import { findSiteEmail } from './email-regex.js';
+import { findSiteEmails } from './email-regex.js';
 import { findInstagramHandle } from './instagram.js';
 import { normalizeDomain, emailDomain, domainsMatch, isWhatsAppRedirect } from './domain.js';
 import { readEnrichedCache, writeEnrichedCache, type CachedContact } from './enrich-cache.js';
@@ -41,7 +41,10 @@ type ContactSource = 'regex' | 'llm';
 /**
  * Layer 1: regex over the full HTML (free). If there's an email on the same
  * domain, it's used (confidence "medium": correct data but no name/role) and
- * the LLM is NOT called. Layer 2: only if Layer 1 found nothing usable.
+ * the LLM is NOT called. Layer 2: only if Layer 1 found nothing on the same
+ * domain. A cross-domain regex email is never trusted over the LLM, but if
+ * the LLM finds no email it's kept with confidence "low" for manual review
+ * (multi-brand businesses often use another brand's domain for contact).
  */
 async function enrichWebsite(
   website: string,
@@ -55,21 +58,37 @@ async function enrichWebsite(
 
   const instagram = includeInstagram ? findInstagramHandle(page.html) : null;
 
-  const regexEmail = findSiteEmail(page.html, domain);
-  if (regexEmail) {
+  const regex = findSiteEmails(page.html, domain);
+  if (regex.discarded.length > 0) {
+    log(`  🗑️  Discarded platform/placeholder email(s) on ${website}: ${regex.discarded.join(', ')}`);
+  }
+
+  if (regex.sameDomain) {
     return {
-      contact: { name: null, role: null, email: regexEmail, confidence: 'medium' },
+      contact: { name: null, role: null, email: regex.sameDomain, confidence: 'medium' },
       source: 'regex',
       instagram,
     };
   }
 
+  const keepCrossDomain = (base: ContactInfo) => {
+    log(
+      `  🔍 Cross-domain email kept for manual review: "${regex.crossDomain}" doesn't match the site's domain (${domain}) for ${website}. Confidence "low".`
+    );
+    return {
+      contact: { ...base, email: regex.crossDomain, confidence: 'low' as const },
+      source: 'regex' as const,
+      instagram,
+    };
+  };
+
   try {
-    const contact = await extractContact(page.html, domain, apiKey);
-    return { contact: flagDomainMismatch(contact, domain, website, log), source: 'llm', instagram };
+    const contact = flagDomainMismatch(await extractContact(page.html, domain, apiKey), domain, website, log);
+    if (!contact.email && regex.crossDomain) return keepCrossDomain(contact);
+    return { contact, source: 'llm', instagram };
   } catch (error) {
     log(`  ⚠️  Error extracting contact from ${website}: ${error instanceof Error ? error.message : error}`);
-    return null;
+    return regex.crossDomain ? keepCrossDomain(EMPTY_CONTACT) : null;
   }
 }
 
@@ -230,7 +249,7 @@ export async function runEnrichment(
   const kept = enrichedLeads.filter(
     (lead) => lead.contactEmail !== null || Boolean(lead.instagram) || Boolean(lead.whatsapp)
   );
-  const filePath = await saveEnrichedResults(kept);
+  const filePath = await saveEnrichedResults(kept, config.outputFields);
 
   log(`📊 ${enrichedLeads.length} processed → ${kept.length} kept (${withEmailCount} with email) → saved to ${filePath}`);
   log(
