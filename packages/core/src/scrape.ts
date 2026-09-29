@@ -1,3 +1,5 @@
+import { fetchPublicUrl, readTextCapped } from './ssrf-guard.js';
+
 const CONTACT_PATHS = ['/contact', '/contact-us', '/about'];
 const REQUEST_TIMEOUT_MS = 8000;
 
@@ -20,15 +22,16 @@ async function fetchPage(url: string): Promise<FetchedPage | null> {
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(url, { signal: controller.signal });
+    const response = await fetchPublicUrl(url, controller.signal);
     if (!response.ok) return null;
 
-    const html = await response.text();
+    const html = await readTextCapped(response);
     if (!html.trim()) return null;
 
     return { url, html };
   } catch {
-    // site down, timeout, infinite redirect, invalid DNS, etc. — try the next candidate URL
+    // site down, timeout, too many redirects, invalid DNS, private/internal
+    // address (SSRF guard), etc. — try the next candidate URL
     return null;
   } finally {
     clearTimeout(timer);

@@ -8,8 +8,8 @@ import net from 'node:net';
  * server from fetching localhost, an internal network, or a cloud
  * provider's metadata endpoint (169.254.169.254).
  *
- * Not used in the discover/enrich pipeline: there, URLs come from Google
- * Places results, not directly from user input.
+ * Also used by the enrich scraper: website URLs come from Google Places
+ * listings, which any business owner can edit, so they're untrusted too.
  */
 
 const BLOCKED_HOSTNAMES = new Set(['localhost']);
@@ -94,4 +94,63 @@ export async function assertPublicHttpUrl(rawUrl: string): Promise<URL> {
   }
 
   return url;
+}
+
+const MAX_REDIRECTS = 5;
+
+/**
+ * fetch() that only ever talks to public hosts. Real sites often redirect
+ * (http→https, non-www→www, etc.), so redirects are followed manually and
+ * EVERY hop is re-validated — otherwise a public URL that redirects to
+ * 169.254.169.254 would bypass the check entirely.
+ */
+export async function fetchPublicUrl(rawUrl: string, signal: AbortSignal): Promise<Response> {
+  let url = await assertPublicHttpUrl(rawUrl);
+  let redirects = 0;
+
+  for (;;) {
+    const response = await fetch(url, { signal, redirect: 'manual' });
+
+    if (response.status < 300 || response.status >= 400) return response;
+
+    const location = response.headers.get('location');
+    if (!location) {
+      throw new Error('The site redirected without a destination.');
+    }
+    if (redirects >= MAX_REDIRECTS) {
+      throw new Error('Too many redirects.');
+    }
+    redirects += 1;
+    url = await assertPublicHttpUrl(new URL(location, url).toString());
+  }
+}
+
+/** Real pages are well under 1 MB; the cap only stops a hostile/broken site from exhausting memory. */
+export const MAX_HTML_BYTES = 5 * 1024 * 1024;
+
+/** Reads the body as text, stopping (and truncating) at `maxBytes`. */
+export async function readTextCapped(response: Response, maxBytes = MAX_HTML_BYTES): Promise<string> {
+  if (!response.body) return '';
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let received = 0;
+  let text = '';
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    const remaining = maxBytes - received;
+    const chunk = value.byteLength > remaining ? value.subarray(0, remaining) : value;
+    received += chunk.byteLength;
+    text += decoder.decode(chunk, { stream: true });
+
+    if (received >= maxBytes) {
+      await reader.cancel();
+      break;
+    }
+  }
+
+  return text + decoder.decode();
 }

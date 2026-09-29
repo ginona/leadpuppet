@@ -5,6 +5,8 @@ export function cleanHtml(html: string): string {
     .replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    // Never rendered to visitors, a common place to hide injected instructions.
+    .replace(/<(template|svg|iframe|object|embed)\b[\s\S]*?<\/\1>/gi, ' ')
     .replace(/<nav[\s\S]*?<\/nav>/gi, ' ')
     .replace(/<footer[\s\S]*?<\/footer>/gi, ' ')
     .replace(/\s+/g, ' ')
